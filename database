@@ -1,0 +1,89 @@
+-- Creación de la base de datos
+CREATE DATABASE IF NOT EXISTS sportclub_reserve;
+USE sportclub_reserve;
+
+-- 1. Tabla de Usuarios (Socio y Administrador)
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    rol VARCHAR(20) DEFAULT 'socio', -- 'socio' o 'admin'
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Tabla de Categorías de Instalación
+CREATE TABLE categorias_instalacion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL, -- 'Deportes', 'Piscinas', 'Restaurantes'
+    descripcion TEXT
+);
+
+-- 3. Tabla de Instalaciones (Canchas, Piscinas, Restaurantes)
+CREATE TABLE instalaciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    categoria_id INT NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    capacidad_maxima INT NOT NULL,
+    requiere_clima BOOLEAN DEFAULT FALSE, -- Para saber si depende del pronóstico del tiempo
+    activa BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (categoria_id) REFERENCES categorias_instalacion(id) ON DELETE CASCADE
+);
+
+-- 4. Tabla de Reservas
+CREATE TABLE reservas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    instalacion_id INT NOT NULL,
+    fecha_reserva DATE NOT NULL,
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NOT NULL,
+    comensales_o_personas INT DEFAULT 1,
+    estado VARCHAR(20) DEFAULT 'confirmada', -- 'confirmada', 'cancelada', 'completada'
+    notas TEXT,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (instalacion_id) REFERENCES instalaciones(id) ON DELETE CASCADE
+);
+
+-- 5. Tabla de Historial de Interacciones con la IA
+CREATE TABLE interacciones_ia (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    prompt TEXT NOT NULL,
+    respuesta TEXT NOT NULL,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- ==========================================
+-- DATOS INICIALES DE PRUEBA (Seeder básico)
+-- ==========================================
+
+-- Insertar Categorías
+INSERT INTO categorias_instalacion (id, nombre, descripcion) VALUES
+(1, 'Deportes', 'Canchas e instalaciones para práctica deportiva'),
+(2, 'Piscinas', 'Áreas de natación deportiva y recreativa'),
+(3, 'Restaurantes', 'Zonas gastronómicas y comedores del club');
+
+-- Insertar Instalaciones del Club
+INSERT INTO instalaciones (categoria_id, nombre, descripcion, capacidad_maxima, requiere_clima, activa) VALUES
+-- Deportes
+(1, 'Cancha de Golf - Hoyo Principal', 'Campo de golf de 18 hoyos', 4, TRUE, TRUE),
+(1, 'Cancha de Tenis 1', 'Cancha de superficie dura con iluminación', 4, TRUE, TRUE),
+(1, 'Cancha de Fútbol 7', 'Cancha de pasto sintético', 14, TRUE, TRUE),
+(1, 'Cancha de Básquetbol', 'Cancha techada de duela', 10, FALSE, TRUE),
+(1, 'Cancha de Vóleibol', 'Cancha al aire libre de arena/concreto', 12, TRUE, TRUE),
+-- Piscinas
+(2, 'Piscina Olímpica - Carril 1', 'Carril de natación individual', 1, FALSE, TRUE),
+(2, 'Piscina Olímpica - Carril 2', 'Carril de natación individual', 1, FALSE, TRUE),
+(2, 'Piscina Recreativa', 'Área general de esparcimiento y refresco', 50, TRUE, TRUE),
+-- Restaurantes
+(3, 'Restaurante Principal Terraza', 'Zona gastronómica con vista a los campos', 30, FALSE, TRUE),
+(3, 'Bar de la Piscina', 'Snacks y bebidas ligeras junto al área de agua', 20, FALSE, TRUE);
+
+-- Insertar un usuario Administrador de prueba (Contraseña cifrada de ejemplo: Admin123)
+INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES
+('Administrador General', 'admin@sportclub.com', '$2b$10$YourHashedPasswordHerePlaceholder', 'admin'),
+('Socio Prueba', 'socio@sportclub.com', '$2b$10$YourHashedPasswordHerePlaceholder', 'socio');
