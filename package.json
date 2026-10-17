@@ -1,17 +1,18 @@
 {
   "name": "sportclub",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Sistema de reservas para SportClub Reserve",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js",
+    "test": "jest --detectOpenHandles --forceExit"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mirandapacabc-maker/SportClub.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Miranda Pacab Cano",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
@@ -26,5 +27,9 @@
     "express": "^5.3.0",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.24.6"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "supertest": "^6.3.0"
   }
 }
